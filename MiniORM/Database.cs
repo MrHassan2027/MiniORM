@@ -26,8 +26,8 @@ public class Database
         var cols = string.Join(", ", props.Select(p => p.GetCustomAttribute<ColumnAttribute>()?.Name ?? p.Name));
         var vals = string.Join(", ", props.Select(p => $"@{p.Name}"));
 
-        using var conn = _factory();
-        conn.Open();
+        var conn = _factory();
+        if (conn.State != ConnectionState.Open) conn.Open();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = $"INSERT INTO {tableName} ({cols}) VALUES ({vals})";
         foreach (var p in props)
@@ -39,11 +39,11 @@ public class Database
     {
         var type = typeof(T);
         var tableName = type.GetCustomAttribute<TableAttribute>()?.Name ?? type.Name;
-        var props = GetMappedProps(type);
+        var props = type.GetProperties().ToList();
         var results = new List<T>();
 
-        using var conn = _factory();
-        conn.Open();
+        var conn = _factory();
+        if (conn.State != ConnectionState.Open) conn.Open();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = $"SELECT * FROM {tableName}";
         using var reader = cmd.ExecuteReader();
@@ -63,15 +63,15 @@ public class Database
 
     private void Execute(string sql)
     {
-        using var conn = _factory();
-        conn.Open();
+        var conn = _factory();
+        if (conn.State != ConnectionState.Open) conn.Open();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = sql;
         cmd.ExecuteNonQuery();
     }
 
     private static List<PropertyInfo> GetMappedProps(Type type) =>
-        type.GetProperties().Where(p => p.GetCustomAttribute<PrimaryKeyAttribute>() == null || true).ToList();
+        type.GetProperties().Where(p => p.GetCustomAttribute<PrimaryKeyAttribute>() == null).ToList();
 
     private static void AddParam(IDbCommand cmd, string name, object? value)
     {
