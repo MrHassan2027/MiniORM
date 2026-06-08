@@ -7,10 +7,10 @@ Maps C# classes to database tables using custom attributes. Supports CRUD operat
 
 ## Quick Start
 ```bash
-git clone https://github.com/yourusername/MiniORM
+git clone https://github.com/MrHassan2027/MiniORM
 cd MiniORM
 dotnet build
-dotnet test
+dotnet run --project Demo
 ```
 
 ```csharp
@@ -45,10 +45,10 @@ var users = db.Query<User>(u => u.Name == "Hassan");
 ## Architecture
 ```
 MiniORM/
-├── Attributes/       # Table, Column, PrimaryKey, NotNull
-├── Core/
-│   ├── Database.cs   # Main API: Insert/Update/Delete/Query
-│   ├── SchemaBuilder.cs  # Generates CREATE TABLE SQL
-│   └── QueryCompiler.cs  # Compiles Expression<Func<T,bool>> → WHERE clause
-└── MiniORM.Tests/    # xUnit tests with in-memory SQLite
+├── MiniORM/
+│   ├── Attributes/       # Table, Column, PrimaryKey
+│   ├── Database.cs       # Main API: Insert/Update/Delete/Query
+│   └── SchemaBuilder.cs  # Generates CREATE TABLE SQL
+└── Demo/
+    └── Program.cs        # In-memory SQLite demo
 ```
